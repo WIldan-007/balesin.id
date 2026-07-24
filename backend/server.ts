@@ -783,6 +783,66 @@ app.get('/api/analytics/instagram/growth', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════
+// FOLLOW GATE — minta follow sebelum kirim link
+// ═══════════════════════════════════════════
+
+// POST /api/follow-gate/check — cek apakah user sudah follow
+app.post('/api/follow-gate/check', async (req, res) => {
+  const { igUserId, targetUsername, accessToken } = req.body;
+  
+  if (!igUserId || !targetUsername || !accessToken) {
+    return res.json({ isFollowing: false, error: 'Missing required fields' });
+  }
+  
+  try {
+    // Cek follow status via Meta Graph API
+    const response = await fetch(
+      `https://graph.facebook.com/v19.0/${igUserId}/follows?access_token=${accessToken}`
+    );
+    const data = await response.json();
+    const isFollowing = data.data?.some((f: any) => f.username === targetUsername) || false;
+    
+    res.json({ isFollowing });
+  } catch {
+    res.json({ isFollowing: false, error: 'Could not verify follow status' });
+  }
+});
+
+// POST /api/follow-gate/unlock — kirim link setelah follow
+app.post('/api/follow-gate/unlock', async (req, res) => {
+  const { campaignId } = req.body;
+  
+  // Ambil campaign & kirim link
+  const campaign = db.campaigns.find((c: any) => c.id === campaignId);
+  if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
+  
+  // Log follow gate activity
+  db.followGateLogs.push({
+    id: `fg-${Date.now()}`,
+    campaignId,
+    linkSent: true,
+    timestamp: new Date().toISOString(),
+  });
+  
+  res.json({
+    success: true,
+    message: 'Link unlocked! Thank you for following 🙏',
+    link: campaign.trackingUrl,
+  });
+});
+
+// ═══════════════════════════════════════════
+// ERROR HANDLING — middleware global
+// ═══════════════════════════════════════════
+app.use((err: any, _req: any, res: any, _next: any) => {
+  console.error('[ERROR]', err.message || err);
+  res.status(500).json({
+    error: 'Terjadi kesalahan. Silakan coba lagi.',
+    code: err.status || 500,
+  });
+});
+
+// ═══════════════════════════════════════════
 // SYSTEM LOGS / TERMINAL
 // ═══════════════════════════════════════════
 app.get('/api/logs', (req, res) => {
@@ -848,6 +908,24 @@ function seedDemoData() {
 
 // Seed on startup
 seedDemoData();
+
+// ═══════════════════════════════════════════
+// PRIVACY POLICY
+// ═══════════════════════════════════════════
+import { readFileSync } from 'fs';
+
+app.get('/privacy', (_req, res) => {
+  try {
+    const content = readFileSync('./privacy.md', 'utf-8');
+    const html = `<!DOCTYPE html><html><head>
+      <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Privacy Policy — balesin.id</title>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+      <style>body{font-family:Inter,sans-serif;max-width:720px;margin:0 auto;padding:40px 20px;background:#fafafa;color:#1e293b;line-height:1.8}h1{font-size:2rem}h2{font-size:1.4rem;margin-top:2rem;color:#F2542D}code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:.9rem}</style>
+    </head><body>${content.replace(/^# /gm, '<h1>').replace(/^## /gm, '<h2>').replace(/^- /gm, '<br>• ').replace(/\n\n/g, '</p><p>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</body></html>`;
+    res.send(html);
+  } catch { res.status(404).send('Privacy policy not found'); }
+});
 
 // ═══════════════════════════════════════════
 // VITE DEV MIDDLEWARE
