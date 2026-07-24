@@ -7,6 +7,7 @@ export type ViewMode =
   | 'new-flow' 
   | 'campaigns' 
   | 'connections' 
+  | 'logs'
   | 'affiliate' 
   | 'settings' 
   | 'checkout-plus' 
@@ -24,6 +25,7 @@ export interface UserProfile {
   trialEndsAt?: string; // ISO string
   trialDaysLeft?: number;
   isTrialExpired?: boolean;
+  isNewUserRegistration?: boolean;
 }
 
 export interface AutomationFlow {
@@ -52,16 +54,57 @@ export interface PlatformNode {
   appSecret?: string;
 }
 
+export type KeywordMatchType = 'Exact Match' | 'Contains' | 'Starts With' | 'Ends With' | 'Regex';
+
+export interface KeywordRule {
+  id: string;
+  word: string;
+  matchType: KeywordMatchType;
+}
+
+export type CampaignCategory = 'Post Automation' | 'Story Automation' | 'Live Automation' | 'DM Automation' | 'Broadcast Automation';
+export type CampaignStatus = 'Running' | 'Paused' | 'Draft' | 'Archived' | 'Failed' | 'Waiting Approval';
+export type CampaignHealth = 'Running' | 'Low CTR' | 'Error' | 'Draft';
+
 export interface Campaign {
   id: string;
   name: string;
   code: string;
+  platform: 'Instagram' | 'WhatsApp' | 'TikTok' | 'Discord';
+  category: CampaignCategory;
+  status: CampaignStatus;
+  health: CampaignHealth;
+  thumbnailUrl: string;
+  postUrl?: string;
+  instagramUsername?: string;
+  keywords: KeywordRule[];
+  dmSent: number;
+  clicks: number;
+  followers: number;
   ctr: number;
   revenue: number;
+  commentCount: number;
+  averageResponse: string;
+  aiCost: string;
+  conversionRate: number;
   activeLinksCount: number;
   uptimeVelocity: number;
-  status: 'ACTIVE' | 'PAUSED' | 'ARCHIVED';
   createdAt: string;
+  aiPrompt?: string;
+  brandVoice?: string;
+  shortlink?: string;
+  destinationUrl?: string;
+}
+
+export interface LiveActivity {
+  id: string;
+  timestamp: string;
+  username: string;
+  avatar?: string;
+  action: 'COMMENTED' | 'AI_REPLIED' | 'DM_SENT' | 'LINK_CLICKED' | 'PURCHASE';
+  details: string;
+  campaignName: string;
+  platform: string;
 }
 
 export interface ShortLink {

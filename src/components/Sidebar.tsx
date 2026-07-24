@@ -6,6 +6,7 @@ import {
   Radio, 
   BarChart3, 
   Gift, 
+  Activity,
   Settings as SettingsIcon, 
   LogOut, 
   PlusCircle, 
@@ -51,6 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, user, se
     { id: 'connections' as ViewMode, label: t('Koneksi Akun', 'Connections'), icon: Radio, badge: '3 Active' },
     { id: 'campaigns' as ViewMode, label: t('Kampanye & Link', 'Campaigns'), icon: BarChart3 },
     { id: 'affiliate' as ViewMode, label: t('Program Afiliasi', 'Affiliate'), icon: Gift, highlight: true },
+    { id: 'logs' as ViewMode, label: t('Log Sistem', 'System Logs'), icon: Activity },
     { id: 'settings' as ViewMode, label: t('Pengaturan', 'Settings'), icon: SettingsIcon },
   ];
 

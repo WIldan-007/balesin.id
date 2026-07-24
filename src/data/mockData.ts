@@ -1,4 +1,4 @@
-import { AutomationFlow, PlatformNode, Campaign, ShortLink, AffiliateNode, SystemLog } from '../types';
+import { AutomationFlow, PlatformNode, Campaign, ShortLink, AffiliateNode, SystemLog, LiveActivity } from '../types';
 
 export const initialFlows: AutomationFlow[] = [
   {
@@ -96,40 +96,187 @@ export const initialPlatformNodes: PlatformNode[] = [
   },
 ];
 
+
 export const initialCampaigns: Campaign[] = [
   {
     id: 'cmp-01',
-    name: 'Q4_ALPHA_RELEASE_SUITE',
-    code: 'Q4_ALPHA',
+    name: 'Promo Flash Sale Sepatu Sneakers',
+    code: 'PROMO_SNEAKERS',
+    platform: 'Instagram',
+    category: 'Post Automation',
+    status: 'Running',
+    health: 'Running',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&auto=format&fit=crop&q=80',
+    postUrl: 'https://instagram.com/p/C9x81a_SNEAKERS',
+    instagramUsername: '@balesin_store',
+    keywords: [
+      { id: 'kw-1', word: 'promo', matchType: 'Contains' },
+      { id: 'kw-2', word: 'harga', matchType: 'Contains' },
+      { id: 'kw-3', word: 'mau', matchType: 'Contains' },
+      { id: 'kw-4', word: 'link', matchType: 'Exact Match' }
+    ],
+    dmSent: 1420,
+    clicks: 890,
+    followers: 245,
     ctr: 18.42,
-    revenue: 14250.00,
-    activeLinksCount: 42,
-    uptimeVelocity: 99.99,
-    status: 'ACTIVE',
+    revenue: 14250,
+    commentCount: 1580,
+    averageResponse: '1.2s',
+    aiCost: '$0.004',
+    conversionRate: 12.8,
+    activeLinksCount: 12,
+    uptimeVelocity: 99.9,
     createdAt: '2025-01-10',
+    aiPrompt: 'Sapa calon pembeli dengan ramah, sebutkan potongan harga 30% hari ini, dan berikan link bls.ai/promo-sneakers.',
+    brandVoice: 'Casual, Persuasif, Ramah',
+    shortlink: 'bls.ai/promo-sneakers',
+    destinationUrl: 'https://balesin.ai/checkout?item=sneakers-v2'
   },
   {
     id: 'cmp-02',
-    name: 'SOCIAL_VIRAL_INJECTION_V2',
-    code: 'VIRAL_V2',
-    ctr: 12.15,
-    revenue: 8940.50,
-    activeLinksCount: 28,
-    uptimeVelocity: 99.95,
-    status: 'ACTIVE',
+    name: 'Free Ebook Strategi Social Media 2026',
+    code: 'EBOOK_2026',
+    platform: 'Instagram',
+    category: 'Post Automation',
+    status: 'Running',
+    health: 'Running',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&auto=format&fit=crop&q=80',
+    postUrl: 'https://instagram.com/p/C8y92b_EBOOK',
+    instagramUsername: '@balesin_official',
+    keywords: [
+      { id: 'kw-5', word: 'ebook', matchType: 'Exact Match' },
+      { id: 'kw-6', word: 'download', matchType: 'Contains' },
+      { id: 'kw-7', word: 'mau ebook', matchType: 'Starts With' }
+    ],
+    dmSent: 2890,
+    clicks: 1740,
+    followers: 610,
+    ctr: 22.15,
+    revenue: 8940,
+    commentCount: 3100,
+    averageResponse: '0.9s',
+    aiCost: '$0.008',
+    conversionRate: 15.4,
+    activeLinksCount: 8,
+    uptimeVelocity: 99.9,
     createdAt: '2025-01-28',
+    aiPrompt: 'Kirimkan PDF Ebook gratis langsung ke DM mereka dan dorong untuk berlangganan Balesin.ai PRO.',
+    brandVoice: 'Edukatif, Pakar, Profesional',
+    shortlink: 'bls.ai/ebook-2026',
+    destinationUrl: 'https://balesin.ai/download/ebook-social-media'
   },
   {
     id: 'cmp-03',
-    name: 'BLACK_FRIDAY_ECOS_MASTERY',
-    code: 'BF_ECOS',
-    ctr: 24.10,
-    revenue: 35120.00,
-    activeLinksCount: 54,
-    uptimeVelocity: 99.98,
-    status: 'ARCHIVED',
-    createdAt: '2024-11-20',
+    name: 'Giveaway Wireless Headphone VIP',
+    code: 'GIVEAWAY_VIP',
+    platform: 'Instagram',
+    category: 'Story Automation',
+    status: 'Paused',
+    health: 'Low CTR',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&auto=format&fit=crop&q=80',
+    postUrl: 'https://instagram.com/p/C7z10c_HEADPHONE',
+    instagramUsername: '@balesin_gadget',
+    keywords: [
+      { id: 'kw-8', word: 'join', matchType: 'Contains' },
+      { id: 'kw-9', word: 'ikut', matchType: 'Contains' }
+    ],
+    dmSent: 680,
+    clicks: 110,
+    followers: 88,
+    ctr: 6.20,
+    revenue: 1200,
+    commentCount: 750,
+    averageResponse: '1.8s',
+    aiCost: '$0.002',
+    conversionRate: 4.1,
+    activeLinksCount: 4,
+    uptimeVelocity: 98.5,
+    createdAt: '2025-02-05',
+    aiPrompt: 'Informasikan syarat giveaway: wajib follow dan klik link formulir untuk konfirmasi keikutsertaan.',
+    brandVoice: 'Semangat, Ceria',
+    shortlink: 'bls.ai/giveaway-vip',
+    destinationUrl: 'https://balesin.ai/form/giveaway'
   },
+  {
+    id: 'cmp-04',
+    name: 'Skincare Glowing Consultation Live',
+    code: 'LIVE_SKINCARE',
+    platform: 'Instagram',
+    category: 'Live Automation',
+    status: 'Draft',
+    health: 'Draft',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&auto=format&fit=crop&q=80',
+    postUrl: 'https://instagram.com/p/C6a03d_LIVE',
+    instagramUsername: '@balesin_beauty',
+    keywords: [
+      { id: 'kw-10', word: 'info', matchType: 'Contains' },
+      { id: 'kw-11', word: 'konsul', matchType: 'Contains' }
+    ],
+    dmSent: 0,
+    clicks: 0,
+    followers: 0,
+    ctr: 0.0,
+    revenue: 0,
+    commentCount: 0,
+    averageResponse: '-',
+    aiCost: '$0.000',
+    conversionRate: 0.0,
+    activeLinksCount: 2,
+    uptimeVelocity: 100.0,
+    createdAt: '2025-02-12',
+    aiPrompt: 'Otomatis jawab pertanyaan tipe kulit secara instant dan berikan rekomendasi paket skincare.',
+    brandVoice: 'Soft-sell, Empatis, Ramah',
+    shortlink: 'bls.ai/konsul-skincare',
+    destinationUrl: 'https://balesin.ai/consultation/skin'
+  }
+];
+
+export const initialLiveActivities: LiveActivity[] = [
+  {
+    id: 'act-1',
+    timestamp: 'Baru saja',
+    username: '@sarah_fashion',
+    action: 'PURCHASE',
+    details: 'Membeli Paket Sneakers via Link (Atribusi Rp 350.000)',
+    campaignName: 'Promo Flash Sale Sepatu Sneakers',
+    platform: 'Instagram'
+  },
+  {
+    id: 'act-2',
+    timestamp: '1 menit lalu',
+    username: '@budi_tech',
+    action: 'LINK_CLICKED',
+    details: 'Mengklik shortlink bls.ai/ebook-2026 dari DM',
+    campaignName: 'Free Ebook Strategi Social Media 2026',
+    platform: 'Instagram'
+  },
+  {
+    id: 'act-3',
+    timestamp: '2 menit lalu',
+    username: '@rinarini_shop',
+    action: 'DM_SENT',
+    details: 'AI Gemini mengirim DM otomatis berisi voucher potongan 30%',
+    campaignName: 'Promo Flash Sale Sepatu Sneakers',
+    platform: 'Instagram'
+  },
+  {
+    id: 'act-4',
+    timestamp: '3 menit lalu',
+    username: '@rinarini_shop',
+    action: 'AI_REPLIED',
+    details: 'AI membalas komentar: "Hai Kak! Cek DM ya untuk link promo khususnya 🎉"',
+    campaignName: 'Promo Flash Sale Sepatu Sneakers',
+    platform: 'Instagram'
+  },
+  {
+    id: 'act-5',
+    timestamp: '3 menit lalu',
+    username: '@rinarini_shop',
+    action: 'COMMENTED',
+    details: 'Menulis komentar: "Minta info harga promo dong kak!"',
+    campaignName: 'Promo Flash Sale Sepatu Sneakers',
+    platform: 'Instagram'
+  }
 ];
 
 export const initialShortLinks: ShortLink[] = [

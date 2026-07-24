@@ -16,6 +16,7 @@ import { NewFlowWizardView } from './views/NewFlowWizardView';
 import { CampaignsView } from './views/CampaignsView';
 import { ConnectionsView } from './views/ConnectionsView';
 import { AffiliateView } from './views/AffiliateView';
+import { SystemLogsView } from './views/SystemLogsView';
 import { SettingsView } from './views/SettingsView';
 import { CheckoutView } from './views/CheckoutView';
 import { AlertTriangle, CreditCard, Sparkles } from 'lucide-react';
@@ -238,6 +239,13 @@ function AppContent() {
                 setView={setView} 
                 user={user} 
                 setUser={setUser}
+              />
+            )}
+
+            {currentView === 'logs' && (
+              <SystemLogsView 
+                setView={setView} 
+                logs={logs} 
               />
             )}
           </main>
