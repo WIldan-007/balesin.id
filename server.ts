@@ -96,7 +96,7 @@ Core Directive: Craft a high-converting, slick, tech-forward response (max 280 c
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, host: true, allowedHosts: ['creatoroz.my.id', 'api.creatoroz.my.id', 'localhost'], origin: 'https://creatoroz.my.id' },
       appType: "spa",
     });
     app.use(vite.middlewares);

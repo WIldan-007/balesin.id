@@ -50,11 +50,11 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, user }) =>
           {user.isLoggedIn ? (
             <button
               id="header-dashboard-btn"
-              onClick={() => setView('dashboard')}
+              onClick={() => setView('terminal')}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F2542D] hover:bg-[#e04520] text-white font-semibold text-xs tracking-wide shadow-sm hover:shadow-md transition-all cursor-pointer"
             >
               <LayoutDashboard className="w-4 h-4" />
-              <span>{t('DASHBOARD OPERATOR', 'OPEN DASHBOARD')}</span>
+              <span>{t('Coba Sekarang', 'Try Now')}</span>
             </button>
           ) : (
             <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, user }) =>
                 onClick={() => setView('terminal')}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F2542D] hover:bg-[#e04520] text-white font-semibold text-xs tracking-wide transition-all shadow-sm hover:shadow-md cursor-pointer"
               >
-                <span>{t('Coba Gratis', 'Get Started')}</span>
+                <span>{t('Coba Sekarang', 'Try Now')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
