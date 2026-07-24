@@ -1,0 +1,20 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profile",
+      "description": "User profiles and subscription trial status",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "avatar": { "type": "string" },
+        "tier": { "type": "string", "enum": ["FREE_TRIAL", "PLUS", "PRO", "AGENCY"] },
+        "createdAt": { "type": "string" },
+        "trialStartDate": { "type": "string" },
+        "trialEndsAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "tier"]
+    }
+  }
+}

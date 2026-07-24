@@ -1,0 +1,6 @@
+{
+  "name": "balesin.ai",
+  "description": "Platform Otomasi Media Sosial & AI Chatbot terdepan untuk Balas Komentar, DM Instagram, WhatsApp & TikTok secara Otonom.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

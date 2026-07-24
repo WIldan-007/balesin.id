@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-sans: 'Inter', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: #475569;
+    background-color: #F8FAFC;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: #0F172A;
+  }
+}
+
+/* Primary Brand Palette Utilities */
+.bg-brand-primary {
+  background-color: #F2542D;
+}
+.text-brand-primary {
+  color: #F2542D;
+}
+.border-brand-primary {
+  border-color: #F2542D;
+}
+
+.bg-brand-secondary {
+  background-color: #0EA5E9;
+}
+.text-brand-secondary {
+  color: #0EA5E9;
+}
+.border-brand-secondary {
+  border-color: #0EA5E9;
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(135deg, #F2542D, #0EA5E9);
+}
+
+.text-brand-gradient {
+  background: linear-gradient(135deg, #F2542D, #0EA5E9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Soft SaaS Cards and Elevation */
+.saas-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s ease-in-out;
+}
+
+.saas-card-hover:hover {
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  transform: translateY(-2px);
+}
+
+/* Custom Scrollbar for sleek SaaS tables & viewports */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
