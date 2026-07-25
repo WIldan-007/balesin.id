@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar';
 import { LanguageProvider } from './context/LanguageContext';
 import { auth, onAuthStateChanged } from './lib/firebase';
 import { syncUserProfileWithFirestore } from './services/authService';
+import { loadUserDataFromFirestore, saveUserDataToFirestore } from './services/userDataService';
 
 import { LandingView } from './views/LandingView';
 import { TerminalView } from './views/TerminalView';
@@ -44,35 +45,90 @@ function AppContent() {
     isTrialExpired: false,
   });
 
-  // Listen to Firebase Auth state
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const profile = await syncUserProfileWithFirestore(firebaseUser);
-          setUser(profile);
-        } catch (err) {
-          console.error('Error loading Firestore profile:', err);
-        }
-      } else {
-        setUser(prev => ({
-          ...prev,
-          isLoggedIn: false,
-        }));
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const [flows, setFlows] = useState<AutomationFlow[]>([]);
+  const [flows, setFlows] = useState<AutomationFlow[]>(initialFlows);
   const [selectedFlowForEdit, setSelectedFlowForEdit] = useState<AutomationFlow | null>(null);
 
-  const [nodes, setNodes] = useState<PlatformNode[]>([]);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [shortLinks, setShortLinks] = useState<ShortLink[]>([]);
-  const [affiliates, setAffiliates] = useState<AffiliateNode[]>([]);
-  const [logs, setLogs] = useState<SystemLog[]>([]);
+  const [nodes, setNodes] = useState<PlatformNode[]>(initialPlatformNodes);
+  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+  const [shortLinks, setShortLinks] = useState<ShortLink[]>(initialShortLinks);
+  const [affiliates, setAffiliates] = useState<AffiliateNode[]>(initialAffiliates);
+  const [logs, setLogs] = useState<SystemLog[]>(initialLogs);
+
+  // Listen to Firebase Auth state
+  useEffect(() => {
+    let isMounted = true;
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (firebaseUser) => {
+        if (!isMounted) return;
+        if (firebaseUser) {
+          try {
+            const profile = await syncUserProfileWithFirestore(firebaseUser);
+            if (!isMounted) return;
+            setUser(profile);
+
+            // Load user's saved app data or empty state for new user
+            const { data, isNewUser } = await loadUserDataFromFirestore(firebaseUser.uid);
+            if (!isMounted) return;
+
+            if (isNewUser || profile.isNewUserRegistration) {
+              // NEW USER: Empty everything!
+              setFlows([]);
+              setNodes([]);
+              setCampaigns([]);
+              setShortLinks([]);
+              setAffiliates([]);
+              setLogs([]);
+            } else {
+              // EXISTING USER: Restore saved data so nothing is lost!
+              setFlows(data.flows || []);
+              setNodes(data.nodes || []);
+              setCampaigns(data.campaigns || []);
+              setShortLinks(data.shortLinks || []);
+              setAffiliates(data.affiliates || []);
+              setLogs(data.logs || []);
+            }
+          } catch (err) {
+            console.error('Error loading Firestore profile/data:', err);
+          }
+        } else {
+          setUser(prev => ({
+            ...prev,
+            isLoggedIn: false,
+          }));
+          // Guest mode fallback
+          setFlows(initialFlows);
+          setNodes(initialPlatformNodes);
+          setCampaigns(initialCampaigns);
+          setShortLinks(initialShortLinks);
+          setAffiliates(initialAffiliates);
+          setLogs(initialLogs);
+        }
+      },
+      (error) => {
+        console.warn('Auth state error:', error);
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
+
+  // Auto-save user data changes to Firestore when logged in
+  useEffect(() => {
+    if (user.isLoggedIn && user.id) {
+      saveUserDataToFirestore(user.id, {
+        flows,
+        nodes,
+        campaigns,
+        shortLinks,
+        affiliates,
+        logs,
+      });
+    }
+  }, [user.isLoggedIn, user.id, flows, nodes, campaigns, shortLinks, affiliates, logs]);
 
   const isPublicPage = currentView === 'landing' || currentView === 'terminal' || currentView === 'checkout-plus' || currentView === 'checkout-pro';
 
@@ -216,6 +272,7 @@ function AppContent() {
                 campaigns={campaigns} 
                 shortLinks={shortLinks}
                 onAddShortLink={handleAddShortLink}
+                onUpdateCampaigns={setCampaigns}
               />
             )}
 
@@ -224,6 +281,15 @@ function AppContent() {
                 setView={setView} 
                 nodes={nodes} 
                 setNodes={setNodes}
+              />
+            )}
+
+            {currentView === 'logs' && (
+              <SystemLogsView 
+                setView={setView} 
+                logs={logs} 
+                setLogs={setLogs}
+                user={user}
               />
             )}
 
@@ -239,13 +305,6 @@ function AppContent() {
                 setView={setView} 
                 user={user} 
                 setUser={setUser}
-              />
-            )}
-
-            {currentView === 'logs' && (
-              <SystemLogsView 
-                setView={setView} 
-                logs={logs} 
               />
             )}
           </main>

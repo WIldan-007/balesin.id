@@ -237,6 +237,57 @@ export const ConnectionsView: React.FC<ConnectionsViewProps> = ({ setView, nodes
         </div>
       )}
 
+      {/* OAuth 1-CLICK CONNECT */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="saas-card p-5 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-3">
+            <Instagram className="w-6 h-6 text-pink-600" />
+            <div>
+              <div className="text-sm font-bold text-slate-900">Instagram</div>
+              <div className="text-[10px] text-slate-500">1 klik — tanpa API Key</div>
+            </div>
+          </div>
+          <a
+            href="/api/auth/instagram"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+          >
+            Login with IG
+          </a>
+        </div>
+
+        <div className="saas-card p-5 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-xs opacity-60">
+          <div className="flex items-center gap-3">
+            <MessageSquare className="w-6 h-6 text-green-600" />
+            <div>
+              <div className="text-sm font-bold text-slate-900">WhatsApp</div>
+              <div className="text-[10px] text-slate-500">Masukkan API Key</div>
+            </div>
+          </div>
+          <button
+            onClick={() => handleOpenConnectModal()}
+            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-all cursor-pointer"
+          >
+            Manual
+          </button>
+        </div>
+
+        <div className="saas-card p-5 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-xs opacity-60">
+          <div className="flex items-center gap-3">
+            <Video className="w-6 h-6 text-sky-600" />
+            <div>
+              <div className="text-sm font-bold text-slate-900">TikTok</div>
+              <div className="text-[10px] text-slate-500">Masukkan API Key</div>
+            </div>
+          </div>
+          <button
+            onClick={() => handleOpenConnectModal()}
+            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-all cursor-pointer"
+          >
+            Manual
+          </button>
+        </div>
+      </div>
+
       {/* CONNECTED NODES CARDS GRID */}
       {nodes.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white border border-dashed border-slate-200 text-center space-y-4 shadow-xs">

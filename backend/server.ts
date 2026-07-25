@@ -97,6 +97,93 @@ app.post('/api/auth/login', (req, res) => {
 // PLATFORM CONNECTIONS — REAL API INTEGRATION
 // ═══════════════════════════════════════════
 
+// OAuth: Instagram — redirect ke Facebook Login (Graph API)
+app.get('/api/auth/instagram', (req, res) => {
+  const appId = process.env.FACEBOOK_APP_ID;
+  const redirectUri = `${process.env.API_URL || 'https://api.creatoroz.my.id'}/api/auth/instagram/callback`;
+  
+  const oauthUrl = `https://www.facebook.com/v19.0/dialog/oauth?` +
+    `client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&` +
+    `scope=instagram_basic,instagram_manage_comments,pages_read_engagement,pages_show_list&` +
+    `response_type=code`;
+  
+  res.redirect(oauthUrl);
+});
+
+// OAuth: Instagram — handle callback (Graph API)
+app.get('/api/auth/instagram/callback', async (req, res) => {
+  const { code, error } = req.query;
+  
+  if (error || !code) {
+    return res.redirect(`${process.env.APP_URL || 'https://creatoroz.my.id'}/connections?error=auth_failed`);
+  }
+  
+  try {
+    const appId = process.env.FACEBOOK_APP_ID;
+    const appSecret = process.env.FACEBOOK_APP_SECRET;
+    const redirectUri = `${process.env.API_URL || 'https://api.creatoroz.my.id'}/api/auth/instagram/callback`;
+    
+    // Tukar code → access token
+    const tokenRes = await fetch(
+      `https://graph.facebook.com/v19.0/oauth/access_token?` +
+      `client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `client_secret=${appSecret}&code=${code}`
+    );
+    const tokenData = await tokenRes.json();
+    
+    if (tokenData.error) {
+      return res.redirect(`${process.env.APP_URL || 'https://creatoroz.my.id'}/connections?error=token_exchange_failed`);
+    }
+    
+    // Exchange ke long-lived token
+    const longRes = await fetch(
+      `https://graph.facebook.com/v19.0/oauth/access_token?` +
+      `grant_type=fb_exchange_token&client_id=${appId}&` +
+      `client_secret=${appSecret}&fb_exchange_token=${tokenData.access_token}`
+    );
+    const longData = await longRes.json();
+    const finalToken = longData.access_token || tokenData.access_token;
+    
+    // Ambil data user
+    const meRes = await fetch(`https://graph.facebook.com/v19.0/me?fields=id,name,accounts&access_token=${finalToken}`);
+    const meData = await meRes.json();
+    
+    // Cari Instagram Business Account
+    let igUsername = meData.name || 'unknown';
+    if (meData.accounts?.data?.length > 0) {
+      const pageRes = await fetch(`https://graph.facebook.com/v19.0/${meData.accounts.data[0].id}?fields=instagram_business_account&access_token=${finalToken}`);
+      const pageData = await pageRes.json();
+      if (pageData.instagram_business_account) {
+        igUsername = `@${pageData.instagram_business_account.id}`;
+      }
+    }
+    
+    // Simpan koneksi
+    const connId = `conn-ig-${Date.now().toString(36)}`;
+    db.connections.push({
+      id: connId,
+      platform: 'Instagram',
+      handle: igUsername,
+      status: 'CONNECTED',
+      apiKey: finalToken.substring(0, 10) + '...',
+      platformUserId: meData.id,
+      tokenExpires: '60 days',
+      lastSync: new Date().toISOString(),
+      connectedAt: new Date().toISOString(),
+    });
+    
+    res.redirect(`${process.env.APP_URL || 'https://creatoroz.my.id'}/connections?success=instagram_connected`);
+    
+  } catch (err: any) {
+    res.redirect(`${process.env.APP_URL || 'https://creatoroz.my.id'}/connections?error=callback_failed`);
+  }
+});
+
+// OAuth: Telegram — redirect ke Telegram
+app.get('/api/auth/telegram', (req, res) => {
+  res.redirect('https://t.me/botfather');
+});
+
 // POST /api/connections/verify — Verify & Connect Platform
 app.post('/api/connections/verify', async (req, res) => {
   const { platform, apiKey, appSecret, handle, apiVersion } = req.body;
@@ -677,7 +764,58 @@ app.post('/api/quiz/generate', (req, res) => {
 });
 
 // ═══════════════════════════════════════════
-// INSTAGRAM ENGAGEMENT ANALYTICS (like ManyChat)
+// INSTAGRAM TOKEN HELPER — Generate token link
+// ═══════════════════════════════════════════
+
+// GET /api/instagram/token-helper — Generate link Graph API Explorer
+app.get('/api/instagram/token-helper', (req, res) => {
+  const appId = process.env.FACEBOOK_APP_ID;
+  const appSecret = process.env.FACEBOOK_APP_SECRET;
+  
+  // Generate login link
+  const loginUrl = `https://www.facebook.com/v19.0/dialog/oauth?` +
+    `client_id=${appId}&redirect_uri=https://developers.facebook.com/tools/explorer/callback&` +
+    `scope=instagram_basic,instagram_manage_comments,pages_read_engagement,pages_show_list&` +
+    `response_type=token`;
+  
+  const html = `<!DOCTYPE html><html><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Token Helper — balesin.id</title>
+    <style>body{font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;background:#fafafa;color:#1e293b;line-height:1.8}
+    .step{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin:12px 0}
+    .step h3{color:#F2542D;margin:0 0 8px}
+    .btn{display:inline-block;padding:12px 24px;border-radius:10px;background:#F2542D;color:#fff;text-decoration:none;font-weight:bold;font-size:14px}
+    code{background:#f1f5f9;padding:2px 8px;border-radius:6px;font-size:13px;word-break:break-all}
+    .token-box{background:#f0fdf4;border:2px solid #86efac;padding:16px;border-radius:12px;margin:12px 0}</style>
+  </head><body>
+    <h1 style="font-size:1.5rem">🔑 Dapatkan Token Instagram</h1>
+    <p style="color:#64748b">Ikuti 3 langkah mudah ini:</p>
+    
+    <div class="step">
+      <h3>1️⃣ Klik link ini</h3>
+      <p>Google akan meminta izin — klik <strong>Continue</strong></p>
+      <a href="${loginUrl}" target="_blank" class="btn">Login dengan Facebook</a>
+    </div>
+    
+    <div class="step">
+      <h3>2️⃣ Copy Token</h3>
+      <p>Setelah login, URL browser akan berubah. Cari <code>access_token=</code> di URL</p>
+      <div class="token-box">
+        <p style="margin:0;font-size:12px;color:#166534">
+          💡 Token biasanya dimulai dengan <strong>EAA...</strong> dan panjang
+        </p>
+      </div>
+    </div>
+    
+    <div class="step">
+      <h3>3️⃣ Paste ke Dashboard</h3>
+      <p>Balik ke dashboard balesin.id, paste token di halaman Connections</p>
+      <a href="https://creatoroz.my.id" class="btn" style="background:#0EA5E9">↩ Kembali ke Dashboard</a>
+    </div>
+  </body></html>`;
+  
+  res.send(html);
+});
 // ═══════════════════════════════════════════
 
 // GET /api/analytics/instagram/overview — Engagement overview (followers, reach, impressions)
